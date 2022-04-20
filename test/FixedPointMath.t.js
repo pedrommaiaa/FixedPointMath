@@ -2,12 +2,51 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 let math;
+let solmateMath;
 
 describe("FixedPointMath", function() {
     beforeEach(async function () {
         const FixedPointMath = await ethers.getContractFactory("FixedPointMath");
         math = await FixedPointMath.deploy();
         await math.deployed();
+
+        const SolmateMath = await ethers.getContractFactory("SolmateMath");
+        solmateMath = await SolmateMath.deploy();
+        await solmateMath.deployed();
+    });
+
+    it("Gas MulDivDown", async function () {
+        const huffMulDivDown = await math.estimateGas.mulDivDown(
+            ethers.utils.parseUnits("2.5", 18), 
+            ethers.utils.parseUnits("0.5", 18), 
+            ethers.utils.parseUnits("1", 18)
+        );
+
+        const solmateMulDivDown = await solmateMath.estimateGas.mulDivDown(
+            ethers.utils.parseUnits("2.5", 18), 
+            ethers.utils.parseUnits("0.5", 18), 
+            ethers.utils.parseUnits("1", 18)
+        );
+
+        console.log("\tsolmateMulDivDown", solmateMulDivDown.toNumber());
+        console.log("\thuffMulDivDown", huffMulDivDown.toNumber());
+    });
+
+    it("Gas MulDivUp", async function () {
+        const huffMulDivUp = await math.estimateGas.mulDivDown(
+            369, 
+            271, 
+            1e2
+        );
+
+        const solmateMulDivUp = await solmateMath.estimateGas.mulDivDown(
+            369, 
+            271, 
+            1e2
+        );
+        
+        console.log("\tsolmateMulDivUp", solmateMulDivUp.toNumber());
+        console.log("\thuffMulDivUp", huffMulDivUp.toNumber());
     });
 
     it("test MulDivDown", async function () {
